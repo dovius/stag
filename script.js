@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // IMPORTANT: Set your event dates here.
     // The format is 'YYYY-MM-DDTHH:MM:SS'
     const EVENT_START_TIME = new Date('2025-06-07T09:45:00');
-    const EVENT_END_TIME = new Date('2025-06-08T12:00:00');
+    const EVENT_END_TIME = new Date('2025-06-08T01:00:00');
 
     // --- DOM ELEMENT REFERENCES ---
     const phases = {
