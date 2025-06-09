@@ -466,22 +466,66 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!galleryImages[currentImageIndex]) return;
         
         const image = galleryImages[currentImageIndex];
+        const loader = document.getElementById('lightbox-loader');
         
-        // Update image
-        lightboxImage.src = image.src;
-        lightboxImage.alt = image.alt;
+        // Show loader, hide image
+        if (loader) {
+            loader.classList.remove('hidden');
+        }
+        if (lightboxImage) {
+            lightboxImage.style.opacity = '0';
+        }
         
-        // Update counter
+        // Disable navigation during loading
+        if (lightboxPrev) lightboxPrev.disabled = true;
+        if (lightboxNext) lightboxNext.disabled = true;
+        
+        // Create new image to preload
+        const newImage = new Image();
+        newImage.onload = function() {
+            // Image loaded successfully
+            if (lightboxImage) {
+                lightboxImage.src = image.src;
+                lightboxImage.alt = image.alt;
+                lightboxImage.style.opacity = '1';
+            }
+            
+            // Hide loader
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+            
+            // Re-enable navigation
+            if (lightboxPrev) {
+                lightboxPrev.disabled = currentImageIndex === 0;
+            }
+            if (lightboxNext) {
+                lightboxNext.disabled = currentImageIndex === galleryImages.length - 1;
+            }
+        };
+        
+        newImage.onerror = function() {
+            // Error loading image
+            console.error('Error loading image:', image.src);
+            if (loader) {
+                loader.innerHTML = '<div class="loader-spinner"></div><p>Klaida kraunant nuotrauką</p>';
+            }
+            
+            // Re-enable navigation
+            if (lightboxPrev) {
+                lightboxPrev.disabled = currentImageIndex === 0;
+            }
+            if (lightboxNext) {
+                lightboxNext.disabled = currentImageIndex === galleryImages.length - 1;
+            }
+        };
+        
+        // Start loading
+        newImage.src = image.src;
+        
+        // Update counter immediately
         if (lightboxCurrent) {
             lightboxCurrent.textContent = currentImageIndex + 1;
-        }
-        
-        // Update navigation buttons
-        if (lightboxPrev) {
-            lightboxPrev.disabled = currentImageIndex === 0;
-        }
-        if (lightboxNext) {
-            lightboxNext.disabled = currentImageIndex === galleryImages.length - 1;
         }
     }
 
