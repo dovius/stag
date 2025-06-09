@@ -1,0 +1,7 @@
+node_modules
+server.js
+.env
+.env.local
+.git
+.DS_Store
+.history

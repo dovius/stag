@@ -108,25 +108,25 @@
                     <!-- Image Preview Grid -->
                     <div class="image-grid" id="image-grid">
                         <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 1" data-index="0">
-                            <img src="./images/CIMG4571.JPG" alt="Bernvakario akimirka 1" loading="lazy">
+                            <img src="./images/thumbs/CIMG4571.JPG" alt="Bernvakario akimirka 1" loading="lazy">
                             <div class="image-overlay">
                                 <span class="zoom-icon">🔍</span>
                             </div>
                         </div>
-                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 2" data-index="1">
-                            <img src="./images/CIMG4575.JPG" alt="Bernvakario akimirka 2" loading="lazy">
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 2" data-index="4">
+                            <img src="./images/thumbs/CIMG4575.JPG" alt="Bernvakario akimirka 2" loading="lazy">
                             <div class="image-overlay">
                                 <span class="zoom-icon">🔍</span>
                             </div>
                         </div>
-                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 3" data-index="2">
-                            <img src="./images/CIMG4586.JPG" alt="Bernvakario akimirka 3" loading="lazy">
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 3" data-index="15">
+                            <img src="./images/thumbs/CIMG4586.JPG" alt="Bernvakario akimirka 3" loading="lazy">
                             <div class="image-overlay">
                                 <span class="zoom-icon">🔍</span>
                             </div>
                         </div>
-                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 4" data-index="3">
-                            <img src="./images/CIMG4578.JPG" alt="Bernvakario akimirka 4" loading="lazy">
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 4" data-index="7">
+                            <img src="./images/thumbs/CIMG4578.JPG" alt="Bernvakario akimirka 4" loading="lazy">
                             <div class="image-overlay">
                                 <span class="zoom-icon">🔍</span>
                             </div>
@@ -161,6 +161,67 @@
                     </div>
                 </div>
 
+                <!-- PRO Gallery Section -->
+                <div class="gallery-section pro-gallery">
+                    <h3>📸 PRO foto galerija</h3>
+                    <p>Profesionalaus fotografo darbai!</p>
+                    
+                    <!-- PRO Image Preview Grid -->
+                    <div class="image-grid" id="pro-image-grid">
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti PRO nuotrauką 1" data-index="0">
+                            <img src="./images/pro-thumbs/_DSC0001.jpg" alt="PRO nuotrauka 1" loading="lazy">
+                            <div class="image-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti PRO nuotrauką 2" data-index="1">
+                            <img src="./images/pro-thumbs/_DSC0003.jpg" alt="PRO nuotrauka 2" loading="lazy">
+                            <div class="image-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti PRO nuotrauką 3" data-index="2">
+                            <img src="./images/pro-thumbs/_DSC0004.jpg" alt="PRO nuotrauka 3" loading="lazy">
+                            <div class="image-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti PRO nuotrauką 4" data-index="3">
+                            <img src="./images/pro-thumbs/_DSC0005.jpg" alt="PRO nuotrauka 4" loading="lazy">
+                            <div class="image-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="cta-button gallery-cta" id="open-pro-gallery">PERŽIŪRĖTI PRO GALERIJĄ</button>
+                </div>
+                
+                <!-- PRO Lightbox Modal -->
+                <div class="lightbox-modal" id="pro-lightbox-modal" role="dialog" aria-modal="true" aria-labelledby="pro-lightbox-title" aria-hidden="true">
+                    <div class="lightbox-backdrop" id="pro-lightbox-backdrop"></div>
+                    <div class="lightbox-content">
+                        <div class="lightbox-header">
+                            <h3 id="pro-lightbox-title">PRO foto galerija</h3>
+                            <button class="lightbox-close" id="pro-lightbox-close" aria-label="Uždaryti PRO galeriją">✕</button>
+                        </div>
+                        <div class="lightbox-body">
+                            <button class="lightbox-nav lightbox-prev" id="pro-lightbox-prev" aria-label="Ankstesnė PRO nuotrauka">‹</button>
+                            <div class="lightbox-image-container">
+                                <div class="lightbox-loader" id="pro-lightbox-loader">
+                                    <div class="loader-spinner"></div>
+                                    <p>Kraunama...</p>
+                                </div>
+                                <img id="pro-lightbox-image" src="" alt="" class="lightbox-image">
+                                <div class="lightbox-counter">
+                                    <span id="pro-lightbox-current">1</span> / <span id="pro-lightbox-total">144</span>
+                                </div>
+                            </div>
+                            <button class="lightbox-nav lightbox-next" id="pro-lightbox-next" aria-label="Kita PRO nuotrauka">›</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Music Player Section -->
                 <div class="music-section">
                     <h3>🎵 Misijos garso takelis</h3>
@@ -169,7 +230,7 @@
                         <span class="music-icon" id="music-icon">▶️</span>
                         <span class="music-text" id="music-text">PLAY</span>
                     </button>
-                    <audio id="music-player" preload="metadata" controls style="display: none;">
+                    <audio id="music-player" preload="metadata" controls style="display: none;" loop>
                         <source src="./bobr.mp3" type="audio/mpeg">
                         Jūsų naršyklė nepalaiko audio elemento.
                     </audio>

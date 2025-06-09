@@ -44,15 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!countdownInterval) { // Start countdown only if it's not already running
                 startCountdown();
             }
+            stopBobrTimer(); // No bobr in pre-event
         } else if (now >= EVENT_START_TIME && now < EVENT_END_TIME) {
             // During-event phase
             showPhase('duringEvent');
             if (countdownInterval) clearInterval(countdownInterval); // Stop countdown if running
             updateSurvivalProgress();
+            stopBobrTimer(); // No bobr during event
         } else {
             // Post-event phase
             showPhase('postEvent');
             if (countdownInterval) clearInterval(countdownInterval);
+            startBobrTimer(); // Start bobr shenanigans! 🦫
         }
     }
 
@@ -292,18 +295,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageGrid = document.getElementById('image-grid');
 
     /**
-     * Loads images from the server
+     * Loads images from the server - Returns Promise
      */
     async function loadGalleryImages() {
         try {
             const response = await fetch('/api/images');
             const images = await response.json();
             galleryImages = images;
-            renderImageGrid();
+            return images;
         } catch (error) {
             console.error('Error loading gallery images:', error);
             // Fallback to existing images if API fails
             galleryImages = getExistingImages();
+            return galleryImages;
         }
     }
 
@@ -324,54 +328,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Renders the image grid dynamically
+     * Initializes the image grid - loads data and attaches listeners
      */
-    function renderImageGrid() {
-        if (!imageGrid || galleryImages.length === 0) return;
+    function initializeImageGrid() {
+        if (!imageGrid) return;
 
-        // Specific preview images to show
-        const previewFilenames = ['CIMG4571.JPG', 'CIMG4575.JPG', 'CIMG4586.JPG', 'CIMG4578.JPG'];
-        
-        // Find these specific images from the gallery
-        const previewImages = previewFilenames.map(filename => {
-            return galleryImages.find(img => 
-                img.filename === filename || 
-                img.src.includes(filename) ||
-                img.src.endsWith(filename)
-            );
-        }).filter(img => img); // Remove undefined items
-        
-        // If we don't have enough specific images, fill with first images
-        while (previewImages.length < 4 && previewImages.length < galleryImages.length) {
-            const nextImage = galleryImages[previewImages.length];
-            if (!previewImages.includes(nextImage)) {
-                previewImages.push(nextImage);
-            }
+        // Load gallery data asynchronously
+        if (galleryImages.length === 0) {
+            loadGalleryImages().then(() => {
+                // Update gallery info and attach listeners
+                updateGalleryInfo();
+                attachImageEventListeners();
+            }).catch(error => {
+                console.error('Failed to load gallery:', error);
+            });
+        } else {
+            // Data already loaded, just attach listeners
+            updateGalleryInfo();
+            attachImageEventListeners();
         }
-        
-        imageGrid.innerHTML = previewImages.map((image, index) => {
-            // Find the actual index of this image in the full gallery
-            const actualIndex = galleryImages.findIndex(img => 
-                img.filename === image.filename || img.src === image.src
-            );
-            // Use thumbnail for preview, full image for lightbox
-            const previewSrc = image.thumbnail || image.src;
-            return `
-                <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką ${index + 1}" data-index="${actualIndex >= 0 ? actualIndex : index}">
-                    <img src="${previewSrc}" alt="${image.alt}" loading="lazy" data-full-src="${image.src}">
-                    <div class="image-overlay">
-                        <span class="zoom-icon">🔍</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        // Update the gallery info text to show total count
-        updateGalleryInfo();
-
-        // Re-attach event listeners to new elements
-        attachImageEventListeners();
     }
+
+    // Function removed - HTML now contains pre-rendered thumbnails
 
     /**
      * Updates gallery information with total image count
@@ -387,16 +365,23 @@ document.addEventListener('DOMContentLoaded', () => {
      * Attaches event listeners to image items
      */
     function attachImageEventListeners() {
-        const imageItems = document.querySelectorAll('.image-item');
+        // Remove old listeners first by getting fresh elements
+        const imageItems = document.querySelectorAll('#image-grid .image-item');
         imageItems.forEach((item) => {
             // Get the actual gallery index from data-index attribute
             const galleryIndex = parseInt(item.dataset.index);
             
-            // Click handler
-            item.addEventListener('click', () => openLightbox(galleryIndex));
+            // Remove old listeners by cloning element
+            const newItem = item.cloneNode(true);
+            item.parentNode.replaceChild(newItem, item);
             
-            // Keyboard handler
-            item.addEventListener('keydown', (event) => {
+            // Add fresh listeners
+            newItem.addEventListener('click', () => {
+                console.log('Clicking image index:', galleryIndex);
+                openLightbox(galleryIndex);
+            });
+            
+            newItem.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
                     openLightbox(galleryIndex);
@@ -752,7 +737,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (musicPlayer) {
-        // Update button when music ends
+        // Update button when music ends (music will auto-loop due to HTML loop attribute)
         musicPlayer.addEventListener('ended', () => {
             updateMusicButton();
         });
@@ -795,10 +780,395 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- PRO GALLERY FUNCTIONALITY ---
+
+    let proGalleryImages = [];
+    let currentProImageIndex = 0;
+    let isProLightboxOpen = false;
+
+    // DOM elements for PRO lightbox
+    const proLightboxModal = document.getElementById('pro-lightbox-modal');
+    const proLightboxImage = document.getElementById('pro-lightbox-image');
+    const proLightboxCurrent = document.getElementById('pro-lightbox-current');
+    const proLightboxTotal = document.getElementById('pro-lightbox-total');
+    const proLightboxClose = document.getElementById('pro-lightbox-close');
+    const proLightboxPrev = document.getElementById('pro-lightbox-prev');
+    const proLightboxNext = document.getElementById('pro-lightbox-next');
+    const proLightboxBackdrop = document.getElementById('pro-lightbox-backdrop');
+    const openProGalleryBtn = document.getElementById('open-pro-gallery');
+    const proImageGrid = document.getElementById('pro-image-grid');
+
+    /**
+     * Loads PRO images from the server - Returns Promise
+     */
+    async function loadProGalleryImages() {
+        try {
+            const response = await fetch('/api/pro-images');
+            const images = await response.json();
+            proGalleryImages = images;
+            return images;
+        } catch (error) {
+            console.error('Error loading PRO gallery images:', error);
+            proGalleryImages = [];
+            return [];
+        }
+    }
+
+    /**
+     * Initializes the PRO image grid - loads data and attaches listeners
+     */
+    function initializeProImageGrid() {
+        if (!proImageGrid) return;
+
+        // Load PRO gallery data asynchronously
+        if (proGalleryImages.length === 0) {
+            loadProGalleryImages().then(() => {
+                // Update gallery info and attach listeners
+                updateProGalleryInfo();
+                attachProImageEventListeners();
+            }).catch(error => {
+                console.error('Failed to load PRO gallery:', error);
+            });
+        } else {
+            // Data already loaded, just attach listeners
+            updateProGalleryInfo();
+            attachProImageEventListeners();
+        }
+    }
+
+    // Function removed - HTML now contains pre-rendered thumbnails
+
+    /**
+     * Updates PRO gallery information with total image count
+     */
+    function updateProGalleryInfo() {
+        const proGallerySection = document.querySelector('.pro-gallery p');
+        if (proGallerySection && proGalleryImages.length > 0) {
+            proGallerySection.textContent = `Profesionalaus fotografo darbai! (${proGalleryImages.length} nuotraukų)`;
+        }
+    }
+
+    /**
+     * Attaches event listeners to PRO image items
+     */
+    function attachProImageEventListeners() {
+        const proImageItems = document.querySelectorAll('#pro-image-grid .image-item');
+        proImageItems.forEach((item) => {
+            const galleryIndex = parseInt(item.dataset.index);
+            
+            // Remove old listeners by cloning element
+            const newItem = item.cloneNode(true);
+            item.parentNode.replaceChild(newItem, item);
+            
+            // Add fresh listeners
+            newItem.addEventListener('click', () => {
+                console.log('Clicking PRO image index:', galleryIndex);
+                openProLightbox(galleryIndex);
+            });
+            
+            newItem.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openProLightbox(galleryIndex);
+                }
+            });
+        });
+    }
+
+    /**
+     * Opens the PRO lightbox modal
+     */
+    function openProLightbox(index = 0) {
+        currentProImageIndex = index;
+        isProLightboxOpen = true;
+        
+        if (proLightboxTotal) {
+            proLightboxTotal.textContent = proGalleryImages.length;
+        }
+        
+        proLightboxModal.classList.add('active');
+        proLightboxModal.setAttribute('aria-hidden', 'false');
+        
+        updateProLightboxImage();
+        
+        proLightboxClose.focus();
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('keydown', handleProLightboxKeydown);
+        
+        // PLAY BOBR SONG! 🎵
+        if (musicPlayer && musicPlayer.paused) {
+            playMusic();
+        }
+    }
+
+    /**
+     * Closes the PRO lightbox modal
+     */
+    function closeProLightbox() {
+        isProLightboxOpen = false;
+        proLightboxModal.classList.remove('active');
+        proLightboxModal.setAttribute('aria-hidden', 'true');
+        
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', handleProLightboxKeydown);
+        
+        if (openProGalleryBtn) {
+            openProGalleryBtn.focus();
+        }
+    }
+
+    /**
+     * Updates the displayed PRO image in lightbox
+     */
+    function updateProLightboxImage() {
+        if (!proGalleryImages[currentProImageIndex]) return;
+        
+        const image = proGalleryImages[currentProImageIndex];
+        const loader = document.getElementById('pro-lightbox-loader');
+        
+        if (loader) {
+            loader.classList.remove('hidden');
+        }
+        if (proLightboxImage) {
+            proLightboxImage.style.opacity = '0';
+        }
+        
+        if (proLightboxPrev) proLightboxPrev.disabled = true;
+        if (proLightboxNext) proLightboxNext.disabled = true;
+        
+        const newImage = new Image();
+        newImage.onload = function() {
+            if (proLightboxImage) {
+                proLightboxImage.src = image.src;
+                proLightboxImage.alt = image.alt;
+                proLightboxImage.style.opacity = '1';
+            }
+            
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+            
+            if (proLightboxPrev) {
+                proLightboxPrev.disabled = currentProImageIndex === 0;
+            }
+            if (proLightboxNext) {
+                proLightboxNext.disabled = currentProImageIndex === proGalleryImages.length - 1;
+            }
+        };
+        
+        newImage.onerror = function() {
+            console.error('Error loading PRO image:', image.src);
+            if (loader) {
+                loader.innerHTML = '<div class="loader-spinner"></div><p>Klaida kraunant PRO nuotrauką</p>';
+            }
+            
+            if (proLightboxPrev) {
+                proLightboxPrev.disabled = currentProImageIndex === 0;
+            }
+            if (proLightboxNext) {
+                proLightboxNext.disabled = currentProImageIndex === proGalleryImages.length - 1;
+            }
+        };
+        
+        newImage.src = image.src;
+        
+        if (proLightboxCurrent) {
+            proLightboxCurrent.textContent = currentProImageIndex + 1;
+        }
+    }
+
+    /**
+     * PRO gallery navigation functions
+     */
+    function showPreviousProImage() {
+        if (currentProImageIndex > 0) {
+            currentProImageIndex--;
+            updateProLightboxImage();
+        }
+    }
+
+    function showNextProImage() {
+        if (currentProImageIndex < proGalleryImages.length - 1) {
+            currentProImageIndex++;
+            updateProLightboxImage();
+        }
+    }
+
+    /**
+     * Handles keyboard navigation in PRO lightbox
+     */
+    function handleProLightboxKeydown(event) {
+        if (!isProLightboxOpen) return;
+        
+        switch (event.key) {
+            case 'Escape':
+                closeProLightbox();
+                break;
+            case 'ArrowLeft':
+                event.preventDefault();
+                showPreviousProImage();
+                break;
+            case 'ArrowRight':
+                event.preventDefault();
+                showNextProImage();
+                break;
+        }
+    }
+
+    // --- PRO GALLERY EVENT LISTENERS ---
+
+    if (openProGalleryBtn) {
+        openProGalleryBtn.addEventListener('click', () => openProLightbox(0));
+    }
+
+    if (proLightboxClose) {
+        proLightboxClose.addEventListener('click', closeProLightbox);
+    }
+
+    if (proLightboxBackdrop) {
+        proLightboxBackdrop.addEventListener('click', closeProLightbox);
+    }
+
+    if (proLightboxPrev) {
+        proLightboxPrev.addEventListener('click', showPreviousProImage);
+    }
+    if (proLightboxNext) {
+        proLightboxNext.addEventListener('click', showNextProImage);
+    }
+
+    // --- FLOATING BOBR ANIMATION ---
+
+    let bobrTimer = null;
+    let bobrCounter = 0;
+
+    /**
+     * Creates and animates a floating bobr
+     */
+    function createFloatingBobr() {
+        // Remove any existing bobr
+        const existingBobr = document.querySelector('.floating-bobr');
+        if (existingBobr) {
+            existingBobr.remove();
+        }
+
+        // Create bobr element
+        const bobr = document.createElement('div');
+        bobr.className = 'floating-bobr';
+
+        // Create img element
+        const img = document.createElement('img');
+        img.src = './bobr.png';
+        img.alt = 'Floating Bobr';
+        img.draggable = false;
+        
+        // Fallback to Justas.jpg if bobr.png fails
+        img.onerror = function() {
+            console.log('bobr.png failed, using Justas.jpg as fallback');
+            this.src = './Justas.jpg';
+        };
+        
+        bobr.appendChild(img);
+
+        // Random corner entry direction
+        const directions = ['from-top-left', 'from-top-right', 'from-bottom-left', 'from-bottom-right'];
+        const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+        bobr.classList.add(randomDirection);
+
+        // Add to page
+        document.body.appendChild(bobr);
+
+        // Show bobr with delay
+        setTimeout(() => {
+            bobr.classList.add('visible');
+        }, 100);
+
+        // Remove bobr after animation completes
+        setTimeout(() => {
+            if (bobr.parentNode) {
+                bobr.remove();
+            }
+        }, 3100);
+
+        console.log(`🦫 Bobr #${++bobrCounter} appeared from ${randomDirection}!`);
+    }
+
+    /**
+     * Starts the bobr timer
+     */
+    function startBobrTimer() {
+        // Clear any existing timer
+        if (bobrTimer) {
+            clearInterval(bobrTimer);
+        }
+
+        // Create bobr every 10 seconds
+        bobrTimer = setInterval(() => {
+            // Only show bobr in post-event phase
+            const now = new Date();
+            if (now >= EVENT_END_TIME || phases.postEvent?.classList.contains('active')) {
+                createFloatingBobr();
+            }
+        }, 10000);
+
+        // Show first bobr after 5 seconds
+        setTimeout(() => {
+            const now = new Date();
+            if (now >= EVENT_END_TIME || phases.postEvent?.classList.contains('active')) {
+                createFloatingBobr();
+            }
+        }, 5000);
+    }
+
+    /**
+     * Stops the bobr timer
+     */
+    function stopBobrTimer() {
+        if (bobrTimer) {
+            clearInterval(bobrTimer);
+            bobrTimer = null;
+        }
+        
+        // Remove any existing bobr
+        const existingBobr = document.querySelector('.floating-bobr');
+        if (existingBobr) {
+            existingBobr.remove();
+        }
+    }
+
     // --- INITIALIZATION ---
 
-    // Load gallery images when page loads
-    loadGalleryImages();
+    // Only load galleries when in post-event phase or when needed
+    function initializeGalleries() {
+        const now = new Date();
+        
+        if (now >= EVENT_END_TIME || phases.postEvent?.classList.contains('active')) {
+            // Initialize galleries - load data and attach listeners
+            initializeImageGrid();
+            initializeProImageGrid();
+        }
+    }
+
+    // Lazy load galleries when post-event phase becomes active
+    if (phases.postEvent) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && 
+                    mutation.attributeName === 'class' && 
+                    mutation.target === phases.postEvent &&
+                    phases.postEvent.classList.contains('active')) {
+                    
+                    // Initialize galleries when post-event phase becomes active
+                    initializeImageGrid();
+                    initializeProImageGrid();
+                }
+            });
+        });
+        
+        observer.observe(phases.postEvent, { attributes: true });
+    }
+
+    // Initialize galleries if already in post-event phase
+    initializeGalleries();
 
     // Run the phase check immediately on page load
     updatePagePhase();

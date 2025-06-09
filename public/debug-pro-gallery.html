@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PRO Gallery Debug</title>
+    <style>
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 20px;
+        }
+        .image-item {
+            border: 2px solid #00FF7F;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .debug-info {
+            background: #222;
+            color: #00FF7F;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body style="background: #121212; color: #E0E0E0;">
+    <h1>PRO Gallery Debug</h1>
+    
+    <div class="debug-info">
+        <h3>API Response Test</h3>
+        <div id="api-debug"></div>
+    </div>
+    
+    <div class="debug-info">
+        <h3>Manual Thumbnail Test</h3>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="./images/pro-thumbs/_DSC0001.jpg" alt="Manual Test 1" onerror="this.style.border='2px solid red'">
+            </div>
+            <div class="image-item">
+                <img src="./images/pro-thumbs/_DSC0003.jpg" alt="Manual Test 2" onerror="this.style.border='2px solid red'">
+            </div>
+            <div class="image-item">
+                <img src="./images/pro-thumbs/_DSC0004.jpg" alt="Manual Test 3" onerror="this.style.border='2px solid red'">
+            </div>
+            <div class="image-item">
+                <img src="./images/pro-thumbs/_DSC0005.jpg" alt="Manual Test 4" onerror="this.style.border='2px solid red'">
+            </div>
+        </div>
+    </div>
+    
+    <div class="debug-info">
+        <h3>API-Generated Thumbnails</h3>
+        <div class="image-grid" id="api-thumbnails"></div>
+    </div>
+
+    <script>
+        // Test API response
+        fetch('/api/pro-images')
+            .then(response => response.json())
+            .then(images => {
+                console.log('API response:', images);
+                
+                const debugDiv = document.getElementById('api-debug');
+                debugDiv.innerHTML = `
+                    <p>Total images: ${images.length}</p>
+                    <p>First 4 images:</p>
+                    <ul>
+                        ${images.slice(0, 4).map((img, i) => `
+                            <li>Image ${i + 1}: ${img.filename}<br>
+                                Thumbnail: ${img.thumbnail}<br>
+                                Src: ${img.src}
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                
+                // Generate API thumbnails
+                const apiGrid = document.getElementById('api-thumbnails');
+                apiGrid.innerHTML = images.slice(0, 4).map((img, i) => `
+                    <div class="image-item">
+                        <img src="${img.thumbnail}" alt="${img.alt}" 
+                             onerror="this.style.border='2px solid red'; console.error('Failed to load:', '${img.thumbnail}');"
+                             onload="console.log('Successfully loaded:', '${img.thumbnail}');">
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('API Error:', error);
+                document.getElementById('api-debug').innerHTML = `<p style="color: red;">API Error: ${error.message}</p>`;
+            });
+    </script>
+</body>
+</html>
