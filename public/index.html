@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Justo Bernvakaris: Paskutinė Misija</title>
+    
+    <!-- Google Fonts: Orbitron for titles, Roboto Mono for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="main-container">
+
+        <!-- ====================================================== -->
+        <!-- PHASE 1: PRE-EVENT (PRIEŠ RENGINĮ)                      -->
+        <!-- ====================================================== -->
+        <section id="phase-pre-event" class="phase">
+            <div class="phase-content">
+                <img src="./Justas.jpg" alt="Justo nuotrauka" class="photo-placeholder">
+                <h1 class="title">JUSTO BERNVAKARIS</h1>
+                <h2 class="subtitle">PASKUTINĖ MISIJA</h2>
+                
+                <div id="countdown" class="countdown-timer">
+                    <div class="timer-unit">
+                        <span id="days">00</span>
+                        <label>Dienos</label>
+                    </div>
+                    <div class="timer-unit">
+                        <span id="hours">00</span>
+                        <label>Valandos</label>
+                    </div>
+                    <div class="timer-unit">
+                        <span id="minutes">00</span>
+                        <label>Minutės</label>
+                    </div>
+                    <div class="timer-unit">
+                        <span id="seconds">00</span>
+                        <label>Sekundės</label>
+                    </div>
+                </div>
+
+                <p class="tagline">Dar liko laiko pasiruošti...</p>
+            </div>
+        </section>
+
+        <!-- ====================================================== -->
+        <!-- PHASE 2: DURING EVENT (RENGINIO METU) - IŠPLĖSTA VERSIJA -->
+        <!-- ====================================================== -->
+        <section id="phase-during-event" class="phase">
+            <div class="phase-content">
+                <!-- Pakeisk 'Justas.jpg' į savo nuotraukos failo pavadinimą -->
+                <img src="./Justas.jpg" alt="Justo nuotrauka" class="photo-placeholder small">
+                <h1 class="title">IŠGYVENIMO GIDAS</h1>
+                <h2 class="subtitle">MISIJA VYKDOMA</h2>
+
+                <!-- Survival Progress Bar -->
+                <div class="progress-bar-container">
+                    <label for="survival-progress">Išgyvenimo lygis:</label>
+                    <progress id="survival-progress" value="10" max="100"></progress>
+                </div>
+
+                <!-- ================== -->
+                <!-- Išgyvenimo Patarimai -->
+                <!-- ================== -->
+                <div class="interactive-section">
+                    <h3>Bernio išgyvenimo patarimai</h3>
+                    <div class="interactive-card">
+                        <button class="interactive-button" data-target="tip-1">Patarimas #1: Hidratacija</button>
+                        <p id="tip-1" class="hidden-content">Vanduo yra tavo draugas. Alus – misijos kuras. Bet nepamiršk draugo.</p>
+                    </div>
+                    <div class="interactive-card">
+                        <button class="interactive-button" data-target="tip-2">Patarimas #2: Orientacija</button>
+                        <p id="tip-2" class="hidden-content">Jei pasiklydai, sek ryškiausią žvaigždę – jaunikį. Jei jaunikis pasiklydo – misija įgavo naujų spalvų.</p>
+                    </div>
+                    <div class="interactive-card">
+                        <button class="interactive-button" data-target="tip-3">Patarimas #3: Strateginis maistas</button>
+                        <p id="tip-3" class="hidden-content">Laiku suvalgytas kebabas arba šaltibarščiai gali atstatyti 50% misijos sėkmės taškų. Planuok iš anksto.</p>
+                    </div>
+                    <div class="interactive-card">
+                        <button class="interactive-button" data-target="tip-4">Patarimas #4: Jaunikio Taisyklė</button>
+                        <p id="tip-4" class="hidden-content">1 taisyklė: Jaunikis visada teisus. 2 taisyklė: Jei jaunikis neteisus, žiūrėti 1 taisyklę.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ====================================================== -->
+        <!-- PHASE 3: POST-EVENT (PO RENGINIO)                       -->
+        <!-- ====================================================== -->
+        <section id="phase-post-event" class="phase">
+            <div class="phase-content">
+                <img src="./Justas.jpg" alt="Justo nuotrauka" class="photo-placeholder small">
+                <h1 class="title">MISIJA ĮVYKDYTA!</h1>
+                <h2 class="subtitle">Legendinis bernvakaris baigtas!</h2>
+                
+                <p class="thank-you-message">Ačiū visiems dalyvavusiems ir prisidėjusiems prie šios istorijos!</p>
+
+                <div class="gallery-section">
+                    <h3>Nuotraukų galerija</h3>
+                    <p>Geriausi akimirkų kadrai iš misijos!</p>
+                    
+                    <!-- Image Preview Grid -->
+                    <div class="image-grid" id="image-grid">
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 1" data-index="0">
+                            <img src="./images/CIMG4571.JPG" alt="Bernvakario akimirka 1" loading="lazy">
+                            <div class="image-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 2" data-index="1">
+                            <img src="./images/CIMG4575.JPG" alt="Bernvakario akimirka 2" loading="lazy">
+                            <div class="image-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 3" data-index="2">
+                            <img src="./images/CIMG4586.JPG" alt="Bernvakario akimirka 3" loading="lazy">
+                            <div class="image-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                        <div class="image-item" tabindex="0" role="button" aria-label="Peržiūrėti nuotrauką 4" data-index="3">
+                            <img src="./images/CIMG4578.JPG" alt="Bernvakario akimirka 4" loading="lazy">
+                            <div class="image-overlay">
+                                <span class="zoom-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="cta-button gallery-cta" id="open-gallery">PERŽIŪRĖTI VISĄ GALERIJĄ</button>
+                </div>
+                
+                <!-- Lightbox Modal -->
+                <div class="lightbox-modal" id="lightbox-modal" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" aria-hidden="true">
+                    <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+                    <div class="lightbox-content">
+                        <div class="lightbox-header">
+                            <h3 id="lightbox-title">Nuotraukų galerija</h3>
+                            <button class="lightbox-close" id="lightbox-close" aria-label="Uždaryti galeriją">✕</button>
+                        </div>
+                        <div class="lightbox-body">
+                            <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Ankstesnė nuotrauka">‹</button>
+                            <div class="lightbox-image-container">
+                                <img id="lightbox-image" src="" alt="" class="lightbox-image">
+                                <div class="lightbox-counter">
+                                    <span id="lightbox-current">1</span> / <span id="lightbox-total">54</span>
+                                </div>
+                            </div>
+                            <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Kita nuotrauka">›</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Music Player Section -->
+                <div class="music-section">
+                    <h3>🎵 Misijos garso takelis</h3>
+                    <p>Paleiskite legendinį bernvakario himną!</p>
+                    <button class="music-button" id="music-button">
+                        <span class="music-icon" id="music-icon">▶️</span>
+                        <span class="music-text" id="music-text">PLAY</span>
+                    </button>
+                    <audio id="music-player" preload="metadata" controls style="display: none;">
+                        <source src="./bobr.mp3" type="audio/mpeg">
+                        Jūsų naršyklė nepalaiko audio elemento.
+                    </audio>
+                </div>
+
+                <div class="placeholder-section">
+                    <h3>Komentarai ir Palinkėjimai</h3>
+                    <p>Palikite savo įspūdžius ir linkėjimus jaunikiui!</p>
+                    
+                    <!-- Comment Form -->
+                    <form id="comment-form">
+                        <input type="text" id="comment-name" placeholder="anonimas" value="Anonimas">
+                        <textarea id="comment-message" placeholder="jūsų palinkėjimas čia..." rows="4" required></textarea>
+                        <button type="submit" class="cta-button">SIŲSTI</button>
+                    </form>
+                    
+                    <!-- Comments Display -->
+                    <div id="comments-container">
+                        <h4>Palinkėjimai ir komentarai:</h4>
+                        <div id="comments-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

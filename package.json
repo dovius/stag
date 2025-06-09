@@ -1,0 +1,18 @@
+{
+  "name": "stag-bachelor-party",
+  "version": "1.0.0",
+  "description": "Justo Bernvakaris bachelor party website with gallery and comments",
+  "main": "index.html",
+  "scripts": {
+    "build": "node generate-thumbs.js",
+    "thumbs": "node generate-thumbs.js",
+    "start": "echo 'Use vercel dev for local development'"
+  },
+  "dependencies": {
+    "pg": "^8.11.0",
+    "sharp": "^0.32.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
